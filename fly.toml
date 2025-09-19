@@ -1,0 +1,31 @@
+app = "videostreaming-server"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[[services]]
+  internal_port = 8765
+  protocol = "tcp"
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "edge_http"]
+
+  # Replace the tcp_checks with an http_check that points to the /healthz endpoint.
+  [services.http_checks]
+    interval = "15s"
+    timeout = "2s"
+    path = "/healthz"
+    method = "GET"
+    protocol = "http"
+    grace_period = "10s"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
